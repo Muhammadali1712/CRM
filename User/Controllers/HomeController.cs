@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 using User.Application.Servise;
+using User.Domain.Models.UserDTO;
 
 namespace User.Controllers;
 
@@ -8,23 +8,33 @@ namespace User.Controllers;
 [Route("api/[controller]")]
 public class HomeController : Controller
 {
-    private readonly IUserCRUD<User.Domain.Entity.User> _iuser;
-    private readonly ILogger<HomeController> _logger;
+    private readonly IUserCRUD<Domain.Entity.User> _iuser;
 
 
-    public HomeController(IUserCRUD<Domain.Entity.User> iuser, ILogger<HomeController> logger)
+    public HomeController(IUserCRUD<Domain.Entity.User> iuser)
     {
         _iuser = iuser;
-        _logger = logger;
     }
 
     [HttpPost]
     [Route("[action]")]
-    public Domain.Entity.User Create(Domain.Entity.User user)
+    public GetUserDto Create(CreateUserDto createUserDto)
     {
+        Domain.Entity.User user = new Domain.Entity.User()
+        {
+            Name = createUserDto.Name,
+            Email = createUserDto.Email,
+        };
+
         Domain.Entity.User created = _iuser.Create(user);
-        
-        return created;
+
+        GetUserDto getUserDto = new GetUserDto()
+        {
+            Id = created.Id,
+            Name = created.Name,
+        };
+
+        return getUserDto;
     }
     [HttpPut]
     [Route("[action]")]
@@ -42,16 +52,26 @@ public class HomeController : Controller
     }
     [HttpGet]
     [Route("[action]")]
-    public Domain.Entity.User GetById(string id)
+    public GetUserDto GetById(string id)
     {
-        Domain.Entity.User get = _iuser.GetById(id);
+        var g = _iuser.GetById(id);
+        GetUserDto get = new GetUserDto()
+        {
+            Id = g.Id,
+            Name = g.Name,
+        };
         return get;
     }
     [HttpGet]
     [Route("[action]")]
-    public IEnumerable<Domain.Entity.User> GetAll()
+    public IEnumerable<GetUserDto> GetAll()
     {
-        IEnumerable<Domain.Entity.User> getall = _iuser.GetAll();
+        var getall = from u in _iuser.GetAll()
+                     select new GetUserDto
+                     {
+                         Id = u.Id,
+                         Name = u.Name,
+                     };
         return getall;
     }
 }

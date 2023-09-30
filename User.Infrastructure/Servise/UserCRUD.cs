@@ -3,13 +3,9 @@ using User.Infrastructure.DB;
 
 namespace User.Infrastructure.Servise;
 
-public class UserCRUD : IUserCRUD<User.Domain.Entity.User>
+public class UserCRUD : IUserCRUD<Domain.Entity.User>
 {
     private MyDbcontext _dbcontext;
-    public UserCRUD()
-    {
-            
-    }
     public UserCRUD(MyDbcontext dbcontext)
     {
         _dbcontext = dbcontext;
